@@ -1,6 +1,13 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
-import { I_Item } from "../../components/Item";
+import { I_User } from "../../components/Item";
+
+export interface I_Item_Resp {
+  id: string;
+  title: string;
+  votesCount: string;
+  author: I_User;
+}
 
 const query = `
       {
@@ -21,7 +28,7 @@ const body = {
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<I_Item[]>
+  res: NextApiResponse<I_Item_Resp[]>
 ) {
   const resp = await fetch(process.env.NEXT_PUBLIC_SUBGRAPH_URL || "", {
     method: "POST",

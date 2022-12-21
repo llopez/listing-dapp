@@ -1,11 +1,12 @@
-import { useAccount, useBalance, useConnect, useContractEvent, useContractWrite, useDisconnect, usePrepareContractWrite, useWaitForTransaction } from 'wagmi';
+import { Address, useAccount, useBalance, useConnect, useContractEvent, useContractWrite, useDisconnect, usePrepareContractWrite, useWaitForTransaction } from 'wagmi';
 import { MetaMaskConnector } from 'wagmi/connectors/metaMask'
 import List from './List';
 import { useContext, useEffect, useState } from 'react';
-import ListingV2 from '../abis/ListingV2.json'
+import ListingV3 from '../abis/ListingV3.json'
 import { BigNumber } from 'ethers';
 import { Context } from './StateProvider';
 import { E_ItemActionType } from '../reducers';
+import { I_Item_Resp } from '../pages/api/listing';
 
 function App() {
   const { address, isConnected } = useAccount()
@@ -20,16 +21,26 @@ function App() {
 
   const [title, setTitle] = useState<string>('')
 
+  useEffect(() => {
+    console.log('fetching subgraph...')
+    fetch('/api/listing', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+    }).then(data => data.json()).then((data: I_Item_Resp[]) => dispatch({ type: E_ItemActionType.Init, payload: data.map(i => ({ ...i, votesCount: parseInt(i.votesCount) })) }))
+  }, [dispatch])
+
   const { config } = usePrepareContractWrite({
     address: '0x576E4df9f9df070e0ae7B4A8f920C814a92eFdB0',
-    abi: ListingV2,
+    abi: ListingV3,
     functionName: 'addItem',
     args: [title]
   })
 
   useContractEvent({
     address: '0x576E4df9f9df070e0ae7B4A8f920C814a92eFdB0',
-    abi: ListingV2,
+    abi: ListingV3,
     eventName: 'ItemAdded',
     listener: (id: BigNumber, title: string, author: string): void => {
       console.log("ItemAdded: ", id, title, author)
@@ -40,10 +51,10 @@ function App() {
 
   useContractEvent({
     address: '0x576E4df9f9df070e0ae7B4A8f920C814a92eFdB0',
-    abi: ListingV2,
+    abi: ListingV3,
     eventName: 'ItemVoted',
-    listener: (id: BigNumber): void => {
-      console.log("ItemVoted: ", id)
+    listener: (id: BigNumber, voter: Address): void => {
+      console.log("ItemVoted: ", id, voter)
 
       const item = items.find(i => i.id === id.toString())
 
@@ -57,7 +68,7 @@ function App() {
 
   useContractEvent({
     address: '0x576E4df9f9df070e0ae7B4A8f920C814a92eFdB0',
-    abi: ListingV2,
+    abi: ListingV3,
     eventName: 'ItemRemoved',
     listener: (id: BigNumber): void => {
       console.log("ItemRemoved: ", id)
@@ -103,15 +114,6 @@ function App() {
   }, [
     isConnected
   ])
-
-  useEffect(() => {
-    fetch('/api/listing', {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-    }).then(data => data.json()).then(data => dispatch({ type: E_ItemActionType.Init, payload: data }))
-  }, [dispatch])
 
   return (
     <div>

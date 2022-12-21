@@ -29,7 +29,7 @@ const itemsReducer: React.Reducer<
 
       return [
         ...state.filter((i) => i.id !== payload.id),
-        { ...item, score: item.votesCount + 1 },
+        { ...item, votesCount: item.votesCount + 1 },
       ];
     case E_ItemActionType.RemoveItem:
       return state.filter((i) => i.id !== payload.id);

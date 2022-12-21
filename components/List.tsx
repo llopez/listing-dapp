@@ -11,7 +11,7 @@ const List = (props: I_ListProps) => {
   return (
     <ul>
       {
-        items.sort((a, b) => b.score - a.score).map(item => <Item key={item.id} item={item} onTx={onTx} />)
+        items.sort((a, b) => b.votesCount - a.votesCount).map(item => <Item key={item.id} item={item} onTx={onTx} />)
       }
     </ul>
   )
