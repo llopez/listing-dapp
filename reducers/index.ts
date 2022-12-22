@@ -1,8 +1,12 @@
 import { I_Item } from "../components/Item";
 import itemsReducer from "./items";
+import transactionReducer, {
+  I_Transaction,
+} from "./transaction";
 
 export interface I_State {
   items: I_Item[];
+  transaction: I_Transaction | null;
 }
 
 export enum E_ItemActionType {
@@ -40,11 +44,12 @@ export interface I_InitAction {
   payload: I_Item[];
 }
 
-const rootReducer: React.Reducer<
-  I_State,
-  I_AddItemAction | I_VoteItemAction | I_RemoveItemAction | I_InitAction
-> = ({ items }, action) => ({
+const rootReducer: React.Reducer<I_State, any> = (
+  { items, transaction },
+  action
+) => ({
   items: itemsReducer(items, action),
+  transaction: transactionReducer(transaction, action),
 });
 
 export default rootReducer;

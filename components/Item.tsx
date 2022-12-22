@@ -1,6 +1,8 @@
 import { useContractWrite, usePrepareContractWrite } from "wagmi"
 import ListingV3 from '../abis/ListingV3.json'
-import { useEffect } from "react"
+import { useContext, useEffect } from "react"
+import { Context } from "./StateProvider"
+import { E_TransactionActionType } from "../reducers/transaction"
 
 export interface I_User {
   id: string
@@ -15,11 +17,12 @@ export interface I_Item {
 
 export interface I_ItemProps {
   item: I_Item
-  onTx: (hash: `0x${string}`) => void
 }
 
 const Item = (props: I_ItemProps) => {
-  const { item, onTx } = props
+  const { item } = props
+
+  const [, dispatch] = useContext(Context)
 
   const { config: configVote } = usePrepareContractWrite({
     address: '0x576E4df9f9df070e0ae7B4A8f920C814a92eFdB0',
@@ -42,14 +45,14 @@ const Item = (props: I_ItemProps) => {
   const { data: dataRemove, isLoading: isLoadingRemove, write: writeRemove } = useContractWrite(configRemove)
 
   useEffect(() => {
-    if (dataVote?.hash) { onTx(dataVote.hash) }
+    if (dataVote?.hash) { dispatch({ type: E_TransactionActionType.AddTransaction, payload: { hash: dataVote.hash } }) }
 
-  }, [dataVote, onTx])
+  }, [dataVote, dispatch])
 
   useEffect(() => {
-    if (dataRemove?.hash) { onTx(dataRemove.hash) }
+    if (dataRemove?.hash) { dispatch({ type: E_TransactionActionType.AddTransaction, payload: { hash: dataRemove.hash } }) }
 
-  }, [dataRemove, onTx])
+  }, [dataRemove, dispatch])
 
   const handleVote: React.MouseEventHandler<HTMLButtonElement> = () => {
     writeVote?.()

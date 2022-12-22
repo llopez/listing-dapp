@@ -8,6 +8,7 @@ import { Context } from './StateProvider';
 import { E_ItemActionType } from '../reducers';
 import { I_Item_Resp } from '../pages/api/listing';
 import Pagination from './Pagination';
+import { E_TransactionActionType } from '../reducers/transaction';
 
 function App() {
   const { address, isConnected } = useAccount()
@@ -16,9 +17,7 @@ function App() {
   const { disconnect } = useDisconnect()
   const { data: balance, isLoading: isLoadingBalance } = useBalance({ address })
 
-  const [tx, setTx] = useState<`0x${string}` | undefined>(undefined)
-
-  const [{ items }, dispatch] = useContext(Context)
+  const [{ items, transaction }, dispatch] = useContext(Context)
 
   const [title, setTitle] = useState<string>('')
 
@@ -92,7 +91,7 @@ function App() {
 
   const { data, isLoading, write } = useContractWrite(config)
 
-  const { isLoading: isLoadingTx } = useWaitForTransaction({ hash: tx })
+  const { isLoading: isLoadingTx } = useWaitForTransaction({ hash: transaction?.hash })
 
   const handleTitleChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
     setTitle(e.target.value)
@@ -104,8 +103,8 @@ function App() {
   }
 
   useEffect(() => {
-    if (data?.hash) { setTx(data.hash) }
-  }, [data])
+    if (data?.hash) { dispatch({ type: E_TransactionActionType.AddTransaction, payload: { hash: data.hash } }) }
+  }, [data, dispatch])
 
   useEffect(() => {
 
@@ -131,7 +130,7 @@ function App() {
 
       {
         isLoadingTx && < div style={{ border: '1px solid red' }}>
-          Transaction: {tx} in progress
+          Transaction: {transaction?.hash} in progress
         </div>
       }
       <div>
@@ -139,7 +138,7 @@ function App() {
         <button onClick={handleAdd} disabled={isLoading}>Add</button>
       </div>
 
-      <List items={items} onTx={(hash: `0x${string}`) => { setTx(hash) }} />
+      <List items={items} />
       <Pagination onChange={(page) => { fetchItems(10, page) }} />
 
     </div >
