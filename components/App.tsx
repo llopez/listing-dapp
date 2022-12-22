@@ -1,12 +1,13 @@
 import { Address, useAccount, useBalance, useConnect, useContractEvent, useContractWrite, useDisconnect, usePrepareContractWrite, useWaitForTransaction } from 'wagmi';
 import { MetaMaskConnector } from 'wagmi/connectors/metaMask'
 import List from './List';
-import { useContext, useEffect, useState } from 'react';
+import { useCallback, useContext, useEffect, useState } from 'react';
 import ListingV3 from '../abis/ListingV3.json'
 import { BigNumber } from 'ethers';
 import { Context } from './StateProvider';
 import { E_ItemActionType } from '../reducers';
 import { I_Item_Resp } from '../pages/api/listing';
+import Pagination from './Pagination';
 
 function App() {
   const { address, isConnected } = useAccount()
@@ -21,15 +22,21 @@ function App() {
 
   const [title, setTitle] = useState<string>('')
 
-  useEffect(() => {
-    console.log('fetching subgraph...')
-    fetch('/api/listing', {
+  const fetchItems = useCallback((per: number, page: number) => {
+    fetch(`/api/listing?per=${per}&page=${page}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json'
       },
     }).then(data => data.json()).then((data: I_Item_Resp[]) => dispatch({ type: E_ItemActionType.Init, payload: data.map(i => ({ ...i, votesCount: parseInt(i.votesCount) })) }))
   }, [dispatch])
+
+
+  useEffect(() => {
+    console.log('fetching subgraph...')
+    fetchItems(10, 1)
+
+  }, [fetchItems])
 
   const { config } = usePrepareContractWrite({
     address: '0x576E4df9f9df070e0ae7B4A8f920C814a92eFdB0',
@@ -133,6 +140,8 @@ function App() {
       </div>
 
       <List items={items} onTx={(hash: `0x${string}`) => { setTx(hash) }} />
+      <Pagination onChange={(page) => { fetchItems(10, page) }} />
+
     </div >
   );
 }

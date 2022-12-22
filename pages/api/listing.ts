@@ -9,27 +9,31 @@ export interface I_Item_Resp {
   author: I_User;
 }
 
-const query = `
-      {
-        items {
-          id
-          title
-          votesCount
-          author {
-            id
-          }
-        }
-      }
-    `;
-
-const body = {
-  query,
-};
-
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<I_Item_Resp[]>
 ) {
+  const { page, per } = req.query;
+
+  const skip = per * page - per;
+
+  const query = `
+  {
+    items(first: ${per}, skip: ${skip}, orderBy: votesCount, orderDirection: desc) {
+      id
+      title
+      votesCount
+      author {
+        id
+      }
+    }
+  }
+`;
+
+  const body = {
+    query,
+  };
+
   const resp = await fetch(process.env.NEXT_PUBLIC_SUBGRAPH_URL || "", {
     method: "POST",
     headers: {
