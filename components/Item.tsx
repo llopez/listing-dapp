@@ -3,7 +3,8 @@ import ListingV3 from '../abis/ListingV3.json'
 import { useContext, useEffect } from "react"
 import { Context } from "./StateProvider"
 import { E_TransactionActionType } from "../reducers/transaction"
-
+import { ListGroup, Image } from "react-bootstrap"
+import { Star, Trash, HandThumbsUp } from 'react-bootstrap-icons'
 export interface I_User {
   id: string
 }
@@ -17,6 +18,12 @@ export interface I_Item {
 
 export interface I_ItemProps {
   item: I_Item
+}
+
+const Actions = () => {
+  return (
+    <span><HandThumbsUp size={24} style={{ cursor: 'pointer' }} /><Trash size={24} style={{ cursor: 'pointer' }} /></span>
+  )
 }
 
 const Item = (props: I_ItemProps) => {
@@ -54,16 +61,37 @@ const Item = (props: I_ItemProps) => {
 
   }, [dataRemove, dispatch])
 
-  const handleVote: React.MouseEventHandler<HTMLButtonElement> = () => {
+  const handleVote: React.MouseEventHandler<SVGElement> = () => {
     writeVote?.()
   }
 
-  const handleRemove: React.MouseEventHandler<HTMLButtonElement> = () => {
+  const handleRemove: React.MouseEventHandler<SVGElement> = () => {
     writeRemove?.()
   }
 
   return (
-    <li>({item.id}) | [{item.votesCount}] | {item.title} | <button onClick={handleVote} disabled={isLoadingVote}>vote</button>| <button onClick={handleRemove} disabled={isLoadingRemove}>remove</button></li>
+    <ListGroup.Item className="border-0">
+      <div className="d-flex justify-content-between">
+        <div className="p-2">
+          {item.title}
+        </div>
+        <div className="d-flex align-items-center">
+          <span className="p-2">{item.votesCount}</span>
+          <Star size={24} />
+        </div>
+      </div>
+
+      <div className="d-flex flex-row justify-content-between align-items-center">
+        <div className="p-2 d-flex align-items-center">
+          <Image src="https://via.placeholder.com/32x32" alt="avatar" />
+          <span className="p-2">{item.author?.id}</span>
+        </div>
+        <div>
+          <span><HandThumbsUp size={24} style={{ cursor: 'pointer' }} onClick={handleVote} /><Trash size={24} style={{ cursor: 'pointer' }} onClick={handleRemove} /></span>
+
+        </div>
+      </div>
+    </ListGroup.Item >
   )
 }
 

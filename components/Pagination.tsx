@@ -1,10 +1,11 @@
 import { useState } from "react"
+import { Pagination } from "react-bootstrap"
 
 interface I_Props {
   onChange: (page: number) => void
 }
 
-const Pagination = (props: I_Props) => {
+const Pager = (props: I_Props) => {
   const { onChange } = props
 
   const [page, setPage] = useState<number>(1)
@@ -23,10 +24,16 @@ const Pagination = (props: I_Props) => {
   }
 
   return (
-    <div>
-      <a onClick={handlePrev}>prev</a> | {page} | <a onClick={handleNext}>next</a>
-    </div>
+    <Pagination className="justify-content-center">
+      <Pagination.First />
+      <Pagination.Prev onClick={handlePrev} />
+      <Pagination.Ellipsis />
+      <Pagination.Item active>{page}</Pagination.Item>
+      <Pagination.Ellipsis />
+      <Pagination.Next onClick={handleNext} />
+      <Pagination.Last />
+    </Pagination>
   )
 }
 
-export default Pagination
+export default Pager

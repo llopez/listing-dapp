@@ -9,6 +9,7 @@ import { E_ItemActionType } from '../reducers';
 import { I_Item_Resp } from '../pages/api/listing';
 import Pagination from './Pagination';
 import { E_TransactionActionType } from '../reducers/transaction';
+import { Alert, Button, Col, Container, Form, Nav, NavDropdown, Navbar, Row, Spinner } from 'react-bootstrap';
 
 function App() {
   const { address, isConnected } = useAccount()
@@ -33,7 +34,7 @@ function App() {
 
   useEffect(() => {
     console.log('fetching subgraph...')
-    fetchItems(10, 1)
+    fetchItems(5, 1)
 
   }, [fetchItems])
 
@@ -122,26 +123,57 @@ function App() {
   ])
 
   return (
-    <div>
-      {_isConnected && <div>Address: {address}</div>}
-      {_isConnected && !isLoadingBalance && <div>Balance: {balance?.formatted}</div>}
-      {!_isConnected && <button onClick={() => { connect() }}>Connect</button>}
-      {_isConnected && <button onClick={() => { disconnect() }}>Disconnect</button>}
+    <>
+      <Navbar expand="sm" variant="light" bg="light">
+        <Container>
+          <Navbar.Brand href="#">Listing</Navbar.Brand>
+          {_isConnected && <Nav>
+            {/* <NetworkSelector /> */}
+            <NavDropdown title={address} align="end">
+              <NavDropdown.Item disabled>
+                {!isLoadingBalance && <span>{balance?.formatted} {balance?.symbol}</span>}
+              </NavDropdown.Item>
+              <NavDropdown.Divider />
+              <NavDropdown.Item onClick={() => { disconnect() }}>
+                Disconnect
+              </NavDropdown.Item>
+            </NavDropdown>
+          </Nav>}
+          {!_isConnected && <Nav.Link onClick={() => { connect() }}>Connect</Nav.Link>}
+        </Container>
+      </Navbar>
+      <Container fluid>
+        <Row md={12} style={{ justifyContent: 'center' }}>
+          <Col md={6}>
+            <Row>
+              <Col>
+                {_isConnected && isLoadingTx && <Alert className="mt-2 d-flex justify-content-between align-items-center">
+                  <span>Waiting for transaction: <a target="blank" href={`https://goerli.etherscan.io/tx/${transaction?.hash}`}>{transaction?.hash}</a></span>
+                  <Spinner animation="border" role="status" />
+                </Alert>}
+              </Col>
+            </Row>
+            <Row style={{ flexDirection: 'column' }} className="mt-4">
+              <Col>
+                <Form>
+                  <Form.Group className="mb-2" controlId="exampleForm.ControlTextarea1">
+                    <Form.Control as="textarea" rows={3} value={title} onChange={handleTitleChange} />
+                  </Form.Group>
+                  <Form.Group className="justify-content-end d-flex">
+                    <Button variant="primary" type="submit" onClick={handleAdd} disabled={isLoading}>
+                      Publish
+                    </Button>
+                  </Form.Group>
+                </Form>
+                <List items={items} />
+                <Pagination onChange={(page) => { fetchItems(5, page) }} />
+              </Col>
+            </Row>
+          </Col>
+        </Row>
+      </Container>
+    </>
 
-      {
-        isLoadingTx && < div style={{ border: '1px solid red' }}>
-          Transaction: {transaction?.hash} in progress
-        </div>
-      }
-      <div>
-        <input type="text" value={title} onChange={handleTitleChange} />
-        <button onClick={handleAdd} disabled={isLoading}>Add</button>
-      </div>
-
-      <List items={items} />
-      <Pagination onChange={(page) => { fetchItems(10, page) }} />
-
-    </div >
   );
 }
 
