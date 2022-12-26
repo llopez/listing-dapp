@@ -2,11 +2,16 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { I_User } from "../../components/Item";
 
+export interface I_Vote {
+  user: I_User;
+}
+
 export interface I_Item_Resp {
   id: string;
   title: string;
   votesCount: string;
   author: I_User;
+  votes: I_Vote[];
 }
 
 export default async function handler(
@@ -25,6 +30,11 @@ export default async function handler(
       votesCount
       author {
         id
+      }
+      votes {
+        user { 
+          id
+        }
       }
     }
   }

@@ -10,6 +10,7 @@ import { I_Item_Resp } from '../pages/api/listing';
 import Pagination from './Pagination';
 import { E_TransactionActionType } from '../reducers/transaction';
 import { Alert, Button, Col, Container, Form, Nav, NavDropdown, Navbar, Row, Spinner } from 'react-bootstrap';
+import { E_UserActionType } from '../reducers/user';
 
 function App() {
   const { address, isConnected } = useAccount()
@@ -31,6 +32,13 @@ function App() {
     }).then(data => data.json()).then((data: I_Item_Resp[]) => dispatch({ type: E_ItemActionType.Init, payload: data.map(i => ({ ...i, votesCount: parseInt(i.votesCount) })) }))
   }, [dispatch])
 
+  useEffect(() => {
+    if (address) {
+      dispatch({ type: E_UserActionType.AddUser, payload: { address: address.toLowerCase() as Address } })
+    } else {
+      dispatch({ type: E_UserActionType.RemoveUser, payload: null })
+    }
+  }, [address, dispatch])
 
   useEffect(() => {
     console.log('fetching subgraph...')
@@ -52,7 +60,13 @@ function App() {
     listener: (id: BigNumber, title: string, author: string): void => {
       console.log("ItemAdded: ", id, title, author)
 
-      dispatch({ type: E_ItemActionType.AddItem, payload: { id: id.toString(), title, votesCount: 0 } })
+      dispatch({
+        type: E_ItemActionType.AddItem, payload: {
+          id: id.toString(), title, votesCount: 0, author: {
+            id: author as Address
+          }
+        }
+      })
     },
   })
 

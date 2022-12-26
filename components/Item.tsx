@@ -1,35 +1,32 @@
-import { useContractWrite, usePrepareContractWrite } from "wagmi"
+import { Address, useContractWrite, usePrepareContractWrite } from "wagmi"
 import ListingV3 from '../abis/ListingV3.json'
 import { useContext, useEffect } from "react"
 import { Context } from "./StateProvider"
 import { E_TransactionActionType } from "../reducers/transaction"
 import { ListGroup, Image } from "react-bootstrap"
 import { Star, Trash, HandThumbsUp } from 'react-bootstrap-icons'
+import { I_Vote } from "../pages/api/listing"
+
 export interface I_User {
-  id: string
+  id: Address
 }
 
 export interface I_Item {
   id: string
   title: string
   votesCount: number
-  author?: I_User
+  author: I_User
+  votes: I_Vote[]
 }
 
 export interface I_ItemProps {
   item: I_Item
 }
 
-const Actions = () => {
-  return (
-    <span><HandThumbsUp size={24} style={{ cursor: 'pointer' }} /><Trash size={24} style={{ cursor: 'pointer' }} /></span>
-  )
-}
-
 const Item = (props: I_ItemProps) => {
   const { item } = props
 
-  const [, dispatch] = useContext(Context)
+  const [{ user }, dispatch] = useContext(Context)
 
   const { config: configVote } = usePrepareContractWrite({
     address: '0x576E4df9f9df070e0ae7B4A8f920C814a92eFdB0',
@@ -69,6 +66,13 @@ const Item = (props: I_ItemProps) => {
     writeRemove?.()
   }
 
+  const isAuthor = user && item.author.id === user.address
+  const alreadyVoted = user && item.votes.filter(v => v.user).map(v => v.user.id).includes(user.address)
+  const noVotes = item.votesCount === 0
+
+  const canVote = !isAuthor && !alreadyVoted
+  const canRemove = noVotes && isAuthor
+
   return (
     <ListGroup.Item className="border-0">
       <div className="d-flex justify-content-between">
@@ -87,8 +91,10 @@ const Item = (props: I_ItemProps) => {
           <span className="p-2">{item.author?.id}</span>
         </div>
         <div>
-          <span><HandThumbsUp size={24} style={{ cursor: 'pointer' }} onClick={handleVote} /><Trash size={24} style={{ cursor: 'pointer' }} onClick={handleRemove} /></span>
-
+          {user && <span>
+            {canVote && <HandThumbsUp size={24} style={{ cursor: 'pointer' }} onClick={handleVote} />}
+            {canRemove && <Trash size={24} style={{ cursor: 'pointer' }} onClick={handleRemove} />}
+          </span>}
         </div>
       </div>
     </ListGroup.Item >

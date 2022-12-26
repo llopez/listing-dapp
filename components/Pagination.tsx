@@ -10,6 +10,11 @@ const Pager = (props: I_Props) => {
 
   const [page, setPage] = useState<number>(1)
 
+  const handleFirst = () => {
+    setPage(1)
+    onChange(1)
+  }
+
   const handlePrev = () => {
     if (page <= 1) return
     const newPage = page - 1
@@ -25,7 +30,7 @@ const Pager = (props: I_Props) => {
 
   return (
     <Pagination className="justify-content-center">
-      <Pagination.First />
+      <Pagination.First onClick={handleFirst} />
       <Pagination.Prev onClick={handlePrev} />
       <Pagination.Ellipsis />
       <Pagination.Item active>{page}</Pagination.Item>
