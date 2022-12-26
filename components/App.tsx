@@ -11,6 +11,7 @@ import Pagination from './Pagination';
 import { E_TransactionActionType } from '../reducers/transaction';
 import { Alert, Button, Col, Container, Form, Nav, NavDropdown, Navbar, Row, Spinner } from 'react-bootstrap';
 import { E_UserActionType } from '../reducers/user';
+import { NetworkSelector } from './NetwokSelector';
 
 function App() {
   const { address, isConnected } = useAccount()
@@ -144,9 +145,9 @@ function App() {
     <>
       <Navbar expand="sm" variant="light" bg="light">
         <Container>
-          <Navbar.Brand href="#">Listing</Navbar.Brand>
+          <Navbar.Brand href="/">Listing</Navbar.Brand>
           {_isConnected && <Nav>
-            {/* <NetworkSelector /> */}
+            <NetworkSelector />
             <NavDropdown title={address} align="end">
               <NavDropdown.Item disabled>
                 {!isLoadingBalance && <span>{balance?.formatted} {balance?.symbol}</span>}
