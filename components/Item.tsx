@@ -29,7 +29,7 @@ const Item = (props: I_ItemProps) => {
   const [{ user }, dispatch] = useContext(Context)
 
   const { config: configVote } = usePrepareContractWrite({
-    address: '0x576E4df9f9df070e0ae7B4A8f920C814a92eFdB0',
+    address: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS,
     abi: ListingV3,
     functionName: 'voteItem',
     args: [item.id],
@@ -37,7 +37,7 @@ const Item = (props: I_ItemProps) => {
   })
 
   const { config: configRemove } = usePrepareContractWrite({
-    address: '0x576E4df9f9df070e0ae7B4A8f920C814a92eFdB0',
+    address: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS,
     abi: ListingV3,
     functionName: 'removeItem',
     args: [item.id],

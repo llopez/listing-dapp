@@ -47,14 +47,14 @@ function App() {
   }, [fetchItems])
 
   const { config } = usePrepareContractWrite({
-    address: '0x576E4df9f9df070e0ae7B4A8f920C814a92eFdB0',
+    address: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS,
     abi: ListingV3,
     functionName: 'addItem',
     args: [title]
   })
 
   useContractEvent({
-    address: '0x576E4df9f9df070e0ae7B4A8f920C814a92eFdB0',
+    address: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS,
     abi: ListingV3,
     eventName: 'ItemAdded',
     listener: (id: BigNumber, title: string, author: string): void => {
@@ -62,16 +62,20 @@ function App() {
 
       dispatch({
         type: E_ItemActionType.AddItem, payload: {
-          id: id.toString(), title, votesCount: 0, author: {
+          id: id.toString(),
+          title,
+          votesCount: 0,
+          author: {
             id: author as Address
-          }
+          },
+          votes: []
         }
       })
     },
   })
 
   useContractEvent({
-    address: '0x576E4df9f9df070e0ae7B4A8f920C814a92eFdB0',
+    address: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS,
     abi: ListingV3,
     eventName: 'ItemVoted',
     listener: (id: BigNumber, voter: Address): void => {
@@ -88,7 +92,7 @@ function App() {
   })
 
   useContractEvent({
-    address: '0x576E4df9f9df070e0ae7B4A8f920C814a92eFdB0',
+    address: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS,
     abi: ListingV3,
     eventName: 'ItemRemoved',
     listener: (id: BigNumber): void => {
