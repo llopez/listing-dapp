@@ -6,6 +6,7 @@ import { E_TransactionActionType } from "../reducers/transaction"
 import { ListGroup, Image } from "react-bootstrap"
 import { Star, Trash, HandThumbsUp } from 'react-bootstrap-icons'
 import { I_Vote } from "../pages/api/listing"
+import { truncateEthAddress } from "../lib/utils"
 
 export interface I_User {
   id: Address
@@ -28,12 +29,19 @@ const Item = (props: I_ItemProps) => {
 
   const [{ user }, dispatch] = useContext(Context)
 
+  const isAuthor = user && item.author.id === user.address
+  const alreadyVoted = user && item.votes.filter(v => v.user).map(v => v.user.id).includes(user.address)
+  const noVotes = item.votesCount === 0
+
+  const canVote = !isAuthor && !alreadyVoted
+  const canRemove = noVotes && !!isAuthor
+
   const { config: configVote } = usePrepareContractWrite({
     address: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS,
     abi: ListingV3,
     functionName: 'voteItem',
     args: [item.id],
-    enabled: true
+    enabled: canVote
   })
 
   const { config: configRemove } = usePrepareContractWrite({
@@ -41,7 +49,7 @@ const Item = (props: I_ItemProps) => {
     abi: ListingV3,
     functionName: 'removeItem',
     args: [item.id],
-    enabled: true
+    enabled: canRemove
   })
 
   const { data: dataVote, isLoading: isLoadingVote, write: writeVote } = useContractWrite(configVote)
@@ -66,12 +74,7 @@ const Item = (props: I_ItemProps) => {
     writeRemove?.()
   }
 
-  const isAuthor = user && item.author.id === user.address
-  const alreadyVoted = user && item.votes.filter(v => v.user).map(v => v.user.id).includes(user.address)
-  const noVotes = item.votesCount === 0
 
-  const canVote = !isAuthor && !alreadyVoted
-  const canRemove = noVotes && isAuthor
 
   return (
     <ListGroup.Item className="border-0">
@@ -87,8 +90,8 @@ const Item = (props: I_ItemProps) => {
 
       <div className="d-flex flex-row justify-content-between align-items-center">
         <div className="p-2 d-flex align-items-center">
-          <Image src="https://via.placeholder.com/32x32" alt="avatar" />
-          <span className="p-2">{item.author?.id}</span>
+          <Image src={`https://effigy.im/a/${item.author.id}.png`} alt="avatar" rounded style={{ width: 24 }} />
+          <span className="p-2" style={{ fontSize: 12 }}>{truncateEthAddress(item.author.id)}</span>
         </div>
         <div>
           {user && <span>

@@ -9,9 +9,10 @@ import { E_ItemActionType } from '../reducers';
 import { I_Item_Resp } from '../pages/api/listing';
 import Pagination from './Pagination';
 import { E_TransactionActionType } from '../reducers/transaction';
-import { Alert, Button, Col, Container, Form, Nav, NavDropdown, Navbar, Row, Spinner } from 'react-bootstrap';
+import { Image, Alert, Button, Col, Container, Form, Nav, NavDropdown, Navbar, Row, Spinner } from 'react-bootstrap';
 import { E_UserActionType } from '../reducers/user';
 import { NetworkSelector } from './NetwokSelector';
+import { truncateEthAddress } from '../lib/utils';
 
 function App() {
   const { address, isConnected } = useAccount()
@@ -141,6 +142,15 @@ function App() {
     isConnected
   ])
 
+  const Title = () => {
+    return (
+      <>
+        <Image src={`https://effigy.im/a/${address}.png`} alt="avatar" rounded style={{ width: 24 }} />
+        <span className='p-2'>{address && truncateEthAddress(address)}</span>
+      </>
+    )
+  }
+
   return (
     <>
       <Navbar expand="sm" variant="light" bg="light">
@@ -148,7 +158,7 @@ function App() {
           <Navbar.Brand href="/">Listing</Navbar.Brand>
           {_isConnected && <Nav>
             <NetworkSelector />
-            <NavDropdown title={address} align="end">
+            <NavDropdown title={<Title />} align="end">
               <NavDropdown.Item disabled>
                 {!isLoadingBalance && <span>{balance?.formatted} {balance?.symbol}</span>}
               </NavDropdown.Item>
