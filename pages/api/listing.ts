@@ -14,11 +14,20 @@ export interface I_Item_Resp {
   votes: I_Vote[];
 }
 
+interface ListingApiRequest {
+  query: Partial<{ [key: string]: number }>;
+}
+
 export default async function handler(
-  req: NextApiRequest,
+  req: ListingApiRequest,
   res: NextApiResponse<I_Item_Resp[]>
 ) {
   const { page, per } = req.query;
+
+  if (page === undefined || per === undefined) {
+    res.status(403).end();
+    return;
+  }
 
   const skip = per * page - per;
 
