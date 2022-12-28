@@ -4,7 +4,7 @@ import { useContext, useEffect } from "react"
 import { Context } from "./StateProvider"
 import { E_TransactionActionType } from "../reducers/transaction"
 import { ListGroup, Image } from "react-bootstrap"
-import { Star, Trash, HandThumbsUp } from 'react-bootstrap-icons'
+import { Star, Trash, HandThumbsUp, Book } from 'react-bootstrap-icons'
 import { I_Vote } from "../pages/api/listing"
 import { truncateEthAddress } from "../lib/utils"
 
@@ -41,7 +41,7 @@ const Item = (props: I_ItemProps) => {
     abi: ListingV3,
     functionName: 'voteItem',
     args: [item.id],
-    enabled: canVote
+    enabled: canVote,
   })
 
   const { config: configRemove } = usePrepareContractWrite({
@@ -74,8 +74,6 @@ const Item = (props: I_ItemProps) => {
     writeRemove?.()
   }
 
-
-
   return (
     <ListGroup.Item className="border-0">
       <div className="d-flex justify-content-between">
@@ -90,6 +88,8 @@ const Item = (props: I_ItemProps) => {
 
       <div className="d-flex flex-row justify-content-between align-items-center">
         <div className="p-2 d-flex align-items-center">
+          <Book size={24} />
+          <span className="p-2">{item.id}</span>
           <Image src={`https://effigy.im/a/${item.author.id}.png`} alt="avatar" rounded style={{ width: 24 }} />
           <span className="p-2" style={{ fontSize: 12 }}>{truncateEthAddress(item.author.id)}</span>
         </div>

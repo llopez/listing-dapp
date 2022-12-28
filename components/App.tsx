@@ -189,7 +189,7 @@ function App() {
                     <Form.Control as="textarea" rows={3} value={title} onChange={handleTitleChange} />
                   </Form.Group>
                   <Form.Group className="justify-content-end d-flex">
-                    <Button variant="primary" type="submit" onClick={handleAdd} disabled={isLoading}>
+                    <Button variant="primary" type="submit" onClick={handleAdd} disabled={isLoading || title.length === 0}>
                       Publish
                     </Button>
                   </Form.Group>
