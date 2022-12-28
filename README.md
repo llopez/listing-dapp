@@ -36,5 +36,6 @@ To learn more about the project, take a look at the following resources:
 
 - https://listing-dapp.vercel.app - frontend
 - https://goerli.etherscan.io/address/0xA3d8CD32d1C45f452682421B7d89bD523Af347b6 - smart contract on explorer
-- https://github.com/llopez/listing-smart-contracts - smart contracts
+- https://github.com/llopez/listing-smart-contracts - smart contracts repository
+- https://github.com/llopez/listing-subgraph - subgraph repository
 
