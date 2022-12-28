@@ -17,7 +17,7 @@ const Item = (props: React.PropsWithChildren<Item>) => {
   }
 
   return (
-    <NavDropdown.Item onClick={handleSelect}>{name}</NavDropdown.Item>
+    <NavDropdown.Item onClick={handleSelect} disabled={name === 'Ethereum'}>{name}</NavDropdown.Item>
   )
 }
 
